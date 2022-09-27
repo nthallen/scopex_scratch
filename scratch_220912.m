@@ -51,6 +51,7 @@ for i = 1:size(CC,1)
   dcourse(CCX(i,1)) = CC(i,2);
 end
 dcourse = cumsum(dcourse);
+%%
 ax = nsubplots(4);
 h = plot(ax(1),T10(T10V),course(T10V)/360+dcourse(T10V), ...
   T10(T10V),(heading(T10V)+dheading(T10V))/360);

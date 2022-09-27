@@ -34,6 +34,7 @@ TurnDegs = zeros(length(starts),1);
 Overshoot = zeros(length(starts),1);
 fig = figure;
 ax = [ subplot(1,2,1) subplot(1,2,2) ];
+fig.WindowState = 'maximized';
 menu_selection = 0;
 mtop = uimenu(fig,'Text','&Animation');
 mitem = uimenu(mtop,'Text','Stop');
@@ -44,7 +45,7 @@ mitem = uimenu(mtop,'Text','Memory');
 mitem.MenuSelectedFcn = @(src,event)memory;
 vgain = 3;
 [payload,gps_offset,payload_hw] = payload_shp;
-pause;
+pause(1);
 for i=1:length(starts) % :-1:1 don't go backwards
   if menu_selection == 1; break; end
   Vpulse = T10 >= Tstarts(i) & T10 <= Tends(i);

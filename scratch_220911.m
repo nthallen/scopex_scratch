@@ -2,7 +2,7 @@
 % Ascender analysis for first Hang Test
 runs = { '220906.2', '220907.1', '220907.3','220907.4'};
 titles = { 'Day1 AM', 'Day1 PM', 'Day2 AM', 'Day2 PM'};
-for runidx = 3 %1:length(runs)
+for runidx = 1:length(runs)
 run = runs{runidx};
 runname = titles{runidx};
 D = load(['RAW/' run '/scopexeng_1.mat']);
