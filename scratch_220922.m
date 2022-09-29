@@ -43,16 +43,19 @@ set(ax(2:2:end),'YAxisLocation','Right');
 linkaxes(ax,'x');
 title(ax(1),runname);
 %%
+ITorque_limit = 30;
+Ndelay = 20;
 fits = zeros(length(starts),2);
+fit_stds = zeros(length(starts),1);
 best_delay = zeros(length(starts),1);
 for i = 1:length(starts)
   V = starts(i):ends(i);
   if any(LRPM_SP(V) > 0)
     Torque = LThrust*(1.24+0.625);
-    AV = F.angular_velocity_z(V);
+    AV = F.angular_velocity_z(V)*pi/180; % use rad/sec
   else
     Torque = RThrust*(1.24+0.625);
-    AV = -F.angular_velocity_z(V);
+    AV = -F.angular_velocity_z(V)*pi/180; % use rad/sec
   end
   AV = AV - AV(1);
 
@@ -69,8 +72,6 @@ for i = 1:length(starts)
   end
   %%
   % Pick the best delay
-  ITorque_limit = 18.65;
-  Ndelay = 20;
   delay_fits = zeros(Ndelay,2);
   delay_stds = zeros(Ndelay,1);
   for delay = 1:Ndelay
@@ -81,12 +82,19 @@ for i = 1:length(starts)
     fity = polyval(delay_fits(delay,:),fitx);
     delay_stds(delay) = std(AV(PVV)-fity);
   end
-  best_delay(i) = find(delay_stds == min(delay_stds,1);
+  if 0
+    best_delay(i) = find(delay_stds == min(delay_stds),1);
+  else
+    best_delay(i) = 5; % Just use the expected sample delay
+  end
   fits(i,:) = delay_fits(best_delay(i),:);
-  figure;
-  plot(1:Ndelay, delay_stds,'*');
-  title(sprintf('%s: Pulse %d Delay stds', runname, i));
-  xlabel('Delay samples');
+  fit_stds = delay_stds(best_delay(i));
+  if 0
+    figure;
+    plot(1:Ndelay, delay_stds,'*');
+    title(sprintf('%s: Pulse %d Delay stds', runname, i));
+    xlabel('Delay samples');
+  end
   %%
   % Try adjusting delay in PMC RPM data by plotting the integral of Torque vs
   % angular velocity. ITh is now integral of torque
@@ -96,35 +104,38 @@ for i = 1:length(starts)
   fitx = [0 100];
   fity = polyval(fits(i,:),fitx);
 
-  if 1
+  if 0
     figure;
-    plot( ...
-      ITq,AV,'.', ...
-      fitx,fity);
+    plot( ITq,AV,'.', fitx,fity);
     xlabel('\int Torque Nms');
     ylabel('Ang Vel deg/s');
     %xlim([0 20]); ylim([-1 4]);
     title(sprintf('%s: pulse %d', runname, i));
   end
-%   ax = nsubplots(2);
-%   plot(ax(1),T10(V),cumsum(Torque(V+14)));
-%   plot(ax(2),T10(V),AV);
-%   title(ax(1),sprintf('%s: pulse %d', runname, i));
 end
-%%
-ax = nsubplots(3);
-plot(ax(1),T10(starts), fits(:,1),'*');
-ylabel(ax(1),'Slope');
-plot(ax(2),T1,D.Nav_T_acc);
-ylabel(ax(2),'T_{acc}');
-plot(ax(3),T1,D.Nav_dThrust_pct,T10,LThrust*100/40,T10,RThrust*100/40);
-ylabel(ax(3),'dThrust %');
+%
+% figure;
+% plot(best_delay,'*');
+% title(sprintf('%s: ITlim = %.2f Delays std %.2f', runname, ...
+%   ITorque_limit, std(best_delay)));
+% xlabel('Pulse');
+% ylabel('Delay samples');
 
-set(ax(1:end-1),'XTickLabels',[]);
-set(ax(2:2:end),'YAxisLocation','Right');
-linkaxes(ax,'x');
-title(ax(1),runname);
-%%
+%
+% ax = nsubplots(3);
+% plot(ax(1),T10(starts), fits(:,1),'*');
+% ylabel(ax(1),'Slope');
+% plot(ax(2),T1,D.Nav_T_acc);
+% ylabel(ax(2),'T_{acc}');
+% plot(ax(3),T1,D.Nav_dThrust_pct,T10,LThrust*100/40,T10,RThrust*100/40);
+% ylabel(ax(3),'dThrust %');
+% 
+% set(ax(1:end-1),'XTickLabels',[]);
+% set(ax(2:2:end),'YAxisLocation','Right');
+% linkaxes(ax,'x');
+% title(ax(1),runname);
+
+%
 OK = [1 2 4 5 6 8:14];
 nOK = [3 7];
 mean_slope = mean(fits(OK,1));
@@ -132,7 +143,9 @@ std_slope = std(fits(OK,1));
 figure;
 plot(OK,fits(OK,1),'*', nOK, fits(nOK,1),'*', [0 15], mean_slope*[1 1]);
 ylabel('Slope');
-title(sprintf('%s: Limite = %.2f Slopes %.3f +/- %.5f', runname, ...
-  ITorque_limit, mean_slope, std_slope));
+title(sprintf('%s: Limit = %.2f Slopes %.3f +/- %.5f, %.5f', runname, ...
+  ITorque_limit, mean_slope, std_slope, mean(fit_stds)));
 grid on;
-
+%
+fprintf(1,'%s: Limit = %.2f Slopes %.3e +/- %.3e, %.3e\n', runname, ...
+  ITorque_limit, mean_slope, std_slope, mean(fit_stds));
