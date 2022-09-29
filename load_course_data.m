@@ -1,8 +1,8 @@
 %%
 % Nav analysis for first Hang Test
+% Define runidx to by 1, 2, 3 or 4 before running
 runs = { '220906.2', '220907.1', '220907.3','220907.4'};
 titles = { 'Day1 AM', 'Day1 PM', 'Day2 AM', 'Day2 PM'};
-for runidx = 2 % 1:length(runs)
 run = runs{runidx};
 runname = titles{runidx};
 D = load(['RAW/' run '/scopexeng_1.mat']);
@@ -51,31 +51,3 @@ for i = 1:size(CC,1)
   dcourse(CCX(i,1)) = CC(i,2);
 end
 dcourse = cumsum(dcourse);
-%%
-ax = nsubplots(4);
-h = plot(ax(1),T10(T10V),course(T10V)/360+dcourse(T10V), ...
-  T10(T10V),(heading(T10V)+dheading(T10V))/360);
-if ~isempty(CCX)
-  hold(ax(1),'on');
-  plot(T10(CCX(:,1)),CCX(:,2),'or');
-  hold(ax(1),'off');
-end
-ylabel(ax(1),'Revolutions');
-set(ax(1),'XTickLabels',[]);
-grid(ax(1),'on');
-title(ax(1),runname);
-
-redraw_digital_status(plot(ax(2),T1(T1V),D.Nav_Status(T1V)), ...
-  { 'Idle', 'PID', 'Fail', 'FF\_Init', 'FF\_Pause', ...
-             'FF\_Done', 'Port1', 'Stbd1', 'Port2', 'Stbd2' });
-set(ax(2),'YAxisLocation','Right','XTickLabels',[]);
-
-plot(ax(3),T1(T1V),D.Nav_PGain(T1V),T1(T1V),D.Nav_IGain(T1V), ...
-  T1(T1V),D.Nav_DGain(T1V));
-ylabel(ax(3),'Gains');
-set(ax(3),'XTickLabels',[]);
-plot(ax(4),T1(T1V),D.Nav_Thrust_pct(T1V));
-set(ax(4),'YAxisLocation','Right');
-ylabel(ax(4),'Thrust %');
-linkaxes(ax,'x');
-end

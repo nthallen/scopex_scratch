@@ -1,4 +1,6 @@
 %% Marco data, Day 1 AM
+% Need to run scratch_220911 with runidx=1 in order to load data
+
 Heights = [
   % time2d, meters from ground, GPS crane height?
   % Initial crane lift
@@ -37,3 +39,22 @@ set(ax(1),'XTickLabels',[],'YAxisLocation','Right');
 plot(ax(2),T10,E.height_std);
 ylabel(ax(2),'Alt std');
 %%
+figure;
+plot(T1,zGPSheight, T1,D.AscPosition, 'g', Heights(:,1),-RopeLenRF,'or');
+legend('GPS','Ascender','Range Finder','Location','SouthWest');
+ylabel('Inferred Rope Length, m');
+xlabel('Seconds');
+title(sprintf('%s: Comparison of Rope Length Measurements',runname));
+%%
+ax = nsubplots(2);
+plot(ax(1),T1,zGPSheight, T1,D.AscPosition, 'g', Heights(:,1),-RopeLenRF,'or');
+legend(ax(1),'GPS','Ascender','Range Finder','Location','SouthWest');
+ylabel(ax(1),'Inferred Rope Length, m');
+plot(ax(2),T1,D.AscPosition - zGPSheight);
+ylabel(ax(2),'Difference, m');
+xlabel(ax(2),'Seconds');
+    
+    set(ax(1:end-1),'XTickLabels',[]);
+    set(ax(2:2:end),'YAxisLocation','Right');
+    linkaxes(ax,'x');
+    title(ax(1),sprintf('%s: Comparison of Rope Length Measurements',runname));

@@ -79,7 +79,7 @@ mvti = 1;
 while i < N
   if mvti <= ncrnmvts
     X = i:crnmvt(mvti,1);
-    zGPSheight(X) = GPSheight(X)-GPSheight(X(1))+D.AscPosition(X(1));
+    zGPSheight(X) = GPSheight(X)-GPSheight(X(min(100,length(X))))+D.AscPosition(X(min(100,length(X))));
     X = crnmvt(mvti,1):crnmvt(mvti,2);
     zGPSheight(X) = D.AscPosition(X(1));
     mvti = mvti+1;
