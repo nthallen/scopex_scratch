@@ -27,6 +27,27 @@ linkaxes(ax,'x');
 Tstarts = T1(starts);
 Tends = T1(ends);
 %%
+ax = nsubplots(2);
+plot(ax(1),T1V,D.PMC_Left_RPM_SP(V1),T1V,D.PMC_Right_RPM_SP(V1))
+ylabel(ax(1),'RPM');
+legend(ax(1),'Port','Starboard');
+title(ax(1),runname);
+
+V10 = T10 >= T1V(1) & T10 <= T1V(end);
+exth = heading(V10)+dheading(V10); % extended heading that doesn't wrap
+plot(ax(2),T10(V10),exth);
+min_exth = floor(min(exth)/360)*360;
+max_exth = ceil(max(exth)/360)*360;
+yticks = min_exth:360:max_exth;
+set(ax(2),'YTick',yticks);
+grid(ax(2),'on');
+ylabel(ax(2),'heading deg');
+xlabel(ax(2),'Seconds since midnight UTC');
+
+set(ax(1:end-1),'XTickLabels',[]);
+set(ax(2:2:end),'YAxisLocation','Right');
+linkaxes(ax,'x');
+%%
 heading_uw = heading+dheading;
 dThrusts = zeros(length(starts),1);
 RopeLens = zeros(length(starts),1);

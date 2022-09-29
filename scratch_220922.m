@@ -43,7 +43,7 @@ set(ax(2:2:end),'YAxisLocation','Right');
 linkaxes(ax,'x');
 title(ax(1),runname);
 %%
-ITorque_limit = 30;
+ITorque_limit = 15;
 Ndelay = 20;
 fits = zeros(length(starts),2);
 fit_stds = zeros(length(starts),1);
@@ -60,6 +60,7 @@ for i = 1:length(starts)
   AV = AV - AV(1);
 
   if 0
+    %%
     ax = nsubplots(3);
     plot(ax(1),T10(V),Torque(V)); ylabel(ax(1),'Torque');
     plot(ax(2),T10(V),cumsum(Torque(V))); ylabel(ax(2),'\int Torque');
@@ -77,10 +78,10 @@ for i = 1:length(starts)
   for delay = 1:Ndelay
     ITq = cumsum(Torque(V+delay))/10;
     PVV = ITq < ITorque_limit; % arbitrary limit where linearity seems to end
-    delay_fits(delay,:) = polyfit(ITq(PVV),AV(PVV),1);
-    fitx = ITq(PVV);
+    delay_fits(delay,:) = polyfit(AV(PVV),ITq(PVV),1);
+    fitx = AV(PVV);
     fity = polyval(delay_fits(delay,:),fitx);
-    delay_stds(delay) = std(AV(PVV)-fity);
+    delay_stds(delay) = std(ITq(PVV)-fity);
   end
   if 0
     best_delay(i) = find(delay_stds == min(delay_stds),1);
@@ -97,16 +98,17 @@ for i = 1:length(starts)
   end
   %%
   % Try adjusting delay in PMC RPM data by plotting the integral of Torque vs
-  % angular velocity. ITh is now integral of torque
+  % angular velocity. ITq is now integral of torque
   ITq = cumsum(Torque(V+best_delay(i)))/10;
   % PVV = ITq < ITorque_limit; % arbitrary limit where linearity seems to end
   % fits(i,:) = polyfit(ITq(PVV),AV(PVV),1);
-  fitx = [0 100];
+  fitx = [0 max(AV)];
   fity = polyval(fits(i,:),fitx);
 
-  if 0
+  if 1 % i==1
+    %%
     figure;
-    plot( ITq,AV,'.', fitx,fity);
+    plot( ITq,AV,'.', fity,fitx);
     xlabel('\int Torque Nms');
     ylabel('Ang Vel deg/s');
     %xlim([0 20]); ylim([-1 4]);
