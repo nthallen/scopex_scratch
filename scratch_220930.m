@@ -1,4 +1,9 @@
 %%
+% scratch_220930.m
+% Try adding webbing into model
+%
+%
+%%
 % Move ahead to more complex formulation
 runidx = 3;
 TVs = {[],[],[22574 24808],[]};
@@ -32,22 +37,25 @@ else
 end
 LRPM = interp1(T2,E.PMC_Left_RPM,T10(T10Vd),'linear');
 RRPM = interp1(T2,E.PMC_Right_RPM,T10(T10Vd),'linear');
-nzRPM = LRPM ~= 0 | RRPM ~= 0;
 LThrust = 8e-5 * abs(LRPM).^2.1625;
 RThrust = 8e-5 * abs(RRPM).^2.1625;
 Thrust = LThrust - RThrust;
 Tau_prop = Thrust * (1.24+0.625);
 omega = F.angular_velocity_z(T10V);
 alpha = diff(omega)*10; % to sec^(-1). diff before NaN
-omega(~nzRPM) = NaN;
-sign_omega = sign(omega);
 alpha = ([alpha;0] + [0;alpha])/2;
-M = [alpha(nzRPM,:) omega(nzRPM,:) sign_omega(nzRPM,:)];
+sign_omega = sign(omega);
 %%
-C = M\Tau_prop(nzRPM);
-I = C(1);
-C_drag = C(2);
-C_fric = C(3);
+h_s = zeros(size(Tau_prop));
+omega_s = h_s;
+alpha_s = h_s;
+tau_s = h_s;
+tau_fric = h_s;
+I = 150; % WAG
+C_drag = 0.25;
+C_fric = 1;
+k_web = 1;
+% Can I estimate k_web, C_fric by looking at the end of pulses?
 %%
 ax = nsubplots(5);
 plot(ax(1),T10(T10V),Tau_prop);
