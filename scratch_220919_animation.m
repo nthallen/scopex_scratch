@@ -1,8 +1,7 @@
 %%
 % Impulse Analysis with animation
-% Run scratch_220912.m for runidx 3 first to load data
-% Also run scratch_220911.m for runidx3 to get dGPSheight
 %%
+% Copied from scratch_220912.m for convenience:
 % Nav analysis for first Hang Test
 runs = { '220906.2', '220907.1', '220907.3','220907.4'};
 titles = { 'Day1 AM', 'Day1 PM', 'Day2 AM', 'Day2 PM'};
